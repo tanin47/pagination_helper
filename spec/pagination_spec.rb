@@ -45,14 +45,14 @@ describe 'pagination' do
   
   it "generates latest correctly" do
     
-    present = Time.local(2011, 9, 5)
+    present = Time.utc(2011, 9, 5)
     selected_day = present
     
     Time.stub!(:now).and_return(present)
     
     page_data = get_pagination_data(selected_day, 1, 7, 10, 107)
     
-    validate_month_data(selected_day - 6 * 7 * 86400, present, page_data.months) 
+    validate_month_data(selected_day - 6 * 7 * 86400 + 1 * 86400, present, page_data.months) 
     validate_unit_data(selected_day - 5 * 7 * 86400, present, page_data.units, 7) 
     
     page_data.units[5].is_selected.should == true
@@ -60,19 +60,22 @@ describe 'pagination' do
     page_data.units[5].page.should == 1
     page_data.units[0].page.should == 6
     
+    start_time = Time.at(selected_day - 6 * 7 * 86400 + 1 * 86400).utc
+    page_data.left.should == - ((start_time.day-1) * 10 / 7).to_i
+    
   end
   
   
   it "generates correctly, even the two-weeks-ago block is selected" do
     
-    present = Time.local(2011, 9, 5)
+    present = Time.utc(2011, 9, 5)
     selected_day = present - 14 * 86400
     
     Time.stub!(:now).and_return(present)
     
     page_data = get_pagination_data(selected_day, 3, 7, 10, 107)
     
-    validate_month_data(selected_day - 6 * 7 * 86400, present, page_data.months) 
+    validate_month_data(selected_day - 6 * 7 * 86400 + 1 * 86400, present, page_data.months) 
     validate_unit_data(selected_day - 5 * 7 * 86400, present, page_data.units, 7) 
     
     page_data.units[5].is_selected.should == true
@@ -82,18 +85,21 @@ describe 'pagination' do
     
     page_data.units[0].page.should == 8
     
+    start_time = Time.at(selected_day - 6 * 7 * 86400 + 1 * 86400).utc
+    page_data.left.should == - ((start_time.day-1) * 10 / 7).to_i
+    
   end
   
   it "adjusts automatically if the selected day is not valid" do
     
-    present = Time.local(2011, 9, 5)
+    present = Time.utc(2011, 9, 5)
     selected_day = present - 1 * 86400
     
     Time.stub!(:now).and_return(present)
     
     page_data = get_pagination_data(selected_day, 1, 7, 10, 107)
     
-    validate_month_data(selected_day + 1 * 86400 - 6 * 7 * 86400, present, page_data.months) 
+    validate_month_data(selected_day + 1 * 86400 - 6 * 7 * 86400 + 1 * 86400, present, page_data.months) 
     validate_unit_data(selected_day + 1 * 86400 - 5 * 7 * 86400, present, page_data.units, 7) 
     
     page_data.units[5].is_selected.should == true
@@ -101,18 +107,21 @@ describe 'pagination' do
     page_data.units[5].page.should == 1
     page_data.units[0].page.should == 6
     
+    start_time = Time.at(selected_day + 1 * 86400 - 6 * 7 * 86400 + 1 * 86400).utc
+    page_data.left.should == - ((start_time.day-1) * 10 / 7).to_i
+    
   end
 
   it "centers correctly" do
     
-    selected_day = Time.local(2009, 12, 5)
-    present = selected_day + 500 * 86400
+    selected_day = Time.utc(2009, 12, 5)
+    present = selected_day + 497 * 86400
     
     Time.stub!(:now).and_return(present)
     
     page_data = get_pagination_data(selected_day, 100, 7, 10, 107)
     
-    validate_month_data(selected_day - 6 * 7 * 86400, selected_day + 4 * 7 * 86400, page_data.months) 
+    validate_month_data(selected_day - 6 * 7 * 86400 + 1 * 86400, selected_day + 4 * 7 * 86400, page_data.months) 
     validate_unit_data(selected_day - 5 * 7 * 86400, selected_day + 4 * 7 * 86400, page_data.units, 7) 
     
     page_data.units[5].is_selected.should == true
@@ -121,6 +130,9 @@ describe 'pagination' do
     
     page_data.units[0].page.should == 105
     page_data.units[9].page.should == 96
+    
+    start_time = Time.at(selected_day - 6 * 7 * 86400 + 1 * 86400).utc
+    page_data.left.should == - ((start_time.day-1) * 10 / 7).to_i
     
   end
 

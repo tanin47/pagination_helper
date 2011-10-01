@@ -22,7 +22,7 @@ module PaginationHelper
     start_end_day, end_end_day = calculate_boundaries(selected_end_day, today, total_blocks, days_per_block)
 
     page_data = PaginationData.new
-    page_data.months = generate_months(start_end_day - days_per_block, end_end_day)
+    page_data.months = generate_months(start_end_day - days_per_block + 1, end_end_day)
     page_data.units = generate_units(start_end_day, end_end_day, selected_end_day, today, days_per_block)
     
     label_page(current_page, page_data.units)
@@ -31,6 +31,9 @@ module PaginationHelper
       m.width = calculate_width_of_month(m, days_per_block, width_per_block)
     }
     
+    start_time = Time.at((start_end_day - days_per_block + 1) * 86400).utc
+    page_data.left = - ((start_time.day - 1) * width_per_block / days_per_block).to_i;
+
     return page_data
     
   end
@@ -63,8 +66,8 @@ module PaginationHelper
     
     def generate_months(start_day, end_day)
       
-      start_time = Time.at(start_day * 86400)
-      end_time = Time.at(end_day * 86400)
+      start_time = Time.at(start_day * 86400).utc
+      end_time = Time.at(end_day * 86400).utc
       
       month = start_time.month
       year = start_time.year
