@@ -6,6 +6,7 @@ end
 
 require 'rspec'
 
+require File.expand_path("../../lib/pagination_data",__FILE__)
 require File.expand_path("../../lib/pagination_month",__FILE__)
 require File.expand_path("../../lib/pagination_unit",__FILE__)
 require File.expand_path("../../lib/pagination_helper",__FILE__)

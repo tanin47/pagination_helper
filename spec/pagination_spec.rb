@@ -41,6 +41,7 @@ end
 describe 'pagination' do
   
   include PaginationRspecHelper
+  include PaginationHelper
   
   it "generates latest correctly" do
     
@@ -49,12 +50,15 @@ describe 'pagination' do
     
     Time.stub!(:now).and_return(present)
     
-    page_data = get_pagination_data(selected_day, 7, 10, 407)
+    page_data = get_pagination_data(selected_day, 1, 7, 10, 107)
     
-    validate_month_data(selected_day - (140 - 7) * 86400, selected_day + 140 * 86400, page_data.months) 
-    validate_unit_data(selected_day - 140 * 86400, present, page_data.units, 7) 
+    validate_month_data(selected_day - 6 * 7 * 86400, present, page_data.months) 
+    validate_unit_data(selected_day - 5 * 7 * 86400, present, page_data.units, 7) 
     
-    page_data.units[19].is_seleted = true
+    page_data.units[5].is_selected.should == true
+    
+    page_data.units[5].page.should == 1
+    page_data.units[0].page.should == 6
     
   end
   
@@ -66,12 +70,17 @@ describe 'pagination' do
     
     Time.stub!(:now).and_return(present)
     
-    page_data = get_pagination_data(selected_day, 7, 10, 407)
+    page_data = get_pagination_data(selected_day, 3, 7, 10, 107)
     
-    validate_month_data(selected_day - (140 - 7) * 86400, selected_day + 140 * 86400, page_data.months) 
-    validate_unit_data(selected_day - 140 * 86400, present, page_data.units, 7) 
+    validate_month_data(selected_day - 6 * 7 * 86400, present, page_data.months) 
+    validate_unit_data(selected_day - 5 * 7 * 86400, present, page_data.units, 7) 
     
-    page_data.units[19].is_seleted = true
+    page_data.units[5].is_selected.should == true
+    
+    page_data.units[5].page.should == 3
+    page_data.units[7].page.should == 1
+    
+    page_data.units[0].page.should == 8
     
   end
   
@@ -82,28 +91,36 @@ describe 'pagination' do
     
     Time.stub!(:now).and_return(present)
     
-    page_data = get_pagination_data(selected_day, 7, 10, 407)
+    page_data = get_pagination_data(selected_day, 1, 7, 10, 107)
     
-    validate_month_data(selected_day - (140 - 7) * 86400, selected_day + 140 * 86400, page_data.months) 
-    validate_unit_data(selected_day - 140 * 86400, present, page_data.units, 7) 
+    validate_month_data(selected_day + 1 * 86400 - 6 * 7 * 86400, present, page_data.months) 
+    validate_unit_data(selected_day + 1 * 86400 - 5 * 7 * 86400, present, page_data.units, 7) 
     
-    page_data.units[19].is_seleted = true
+    page_data.units[5].is_selected.should == true
+    
+    page_data.units[5].page.should == 1
+    page_data.units[0].page.should == 6
     
   end
 
   it "centers correctly" do
     
-    present = Time.local(2011, 9, 5)
-    selected_day = Time.local(2009, 9, 5)
+    selected_day = Time.local(2009, 12, 5)
+    present = selected_day + 500 * 86400
     
     Time.stub!(:now).and_return(present)
     
-    page_data = get_pagination_data(selected_day, 7, 10, 407)
+    page_data = get_pagination_data(selected_day, 100, 7, 10, 107)
     
-    validate_month_data(selected_day - (140 - 7) * 86400, selected_day + 140 * 86400, page_data.months) 
-    validate_unit_data(selected_day - 140 * 86400, selected_day + 140 * 86400, page_data.units, 7) 
+    validate_month_data(selected_day - 6 * 7 * 86400, selected_day + 4 * 7 * 86400, page_data.months) 
+    validate_unit_data(selected_day - 5 * 7 * 86400, selected_day + 4 * 7 * 86400, page_data.units, 7) 
     
-    page_data.units[19].is_seleted = true
+    page_data.units[5].is_selected.should == true
+    
+    page_data.units[5].page.should == 100
+    
+    page_data.units[0].page.should == 105
+    page_data.units[9].page.should == 96
     
   end
 
